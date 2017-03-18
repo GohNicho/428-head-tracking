@@ -191,7 +191,9 @@ float computeComplementaryFilter ( float AngleGyro, float AngleAccel, float Gyro
 
 {
   
-  AngleAccurate = (GyroPercentage*AngleGyro) + ((1-GyroPercentage)* AngleAccel);
+  float AngleAccurate =0;
+   
+ AngleAccurate = (GyroPercentage*AngleGyro) + ((1-GyroPercentage)* AngleAccel);
   return (AngleAccurate);
   
 }  
@@ -531,9 +533,9 @@ void loop() {
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
 
-            float acc_x_val = aaWorld.x
-            float acc_y_val = aaWorld.y
-            float acc_z_val = aaWorld.z
+            float acc_x_val = aaWorld.x;
+            float acc_y_val = aaWorld.y;
+            float acc_z_val = aaWorld.z;
                     
             Serial.print("aworld\t");
             Serial.print(aaWorld.x);
