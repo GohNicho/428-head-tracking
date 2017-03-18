@@ -33,7 +33,7 @@ To Run:
 
 1)  upload sketch blue_tooth_slave.ino to Arduino
 
-pair the arduino with computer through bluetooth
+pair the arduino with computer through bluetooth (password 0000)
 
 3) run test_bluetooth.pde
 

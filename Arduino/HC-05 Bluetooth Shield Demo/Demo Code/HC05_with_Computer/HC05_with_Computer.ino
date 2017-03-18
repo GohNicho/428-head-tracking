@@ -1,0 +1,45 @@
+// This program shows how to control arduino from PC Via Bluetooth
+// you will first have to link the HC-05 with your computer with the pairing code 1234
+// download a terminal emulator such as Tera Form
+// connect the serial COM port in Tera Term with the HC-05
+// upload the following code on your Arduino
+// enter 0 & 1 in Tera Term to blink the LED
+//
+// Connect ...
+// arduino>>bluetooth
+// D11   >>>  Rx
+// D10   >>>  Tx
+//Written By Mohannad Rawashdeh
+//for http://www.genotronex.com/
+
+// you will need arduino 1.0.1 or higher to run this sketch
+
+#include <SoftwareSerial.h>// import the serial library
+
+SoftwareSerial Genotronex(10, 11); // RX, TX
+int ledpin=13; // led on D13 will show blink on / off
+int BluetoothData; // the data given from Computer
+
+void setup() {
+  // put your setup code here, to run once:
+  Genotronex.begin(9600);
+  Genotronex.println("Bluetooth On please press 1 or 0 blink LED ..");
+  pinMode(ledpin,OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+   if (Genotronex.available()){
+BluetoothData=Genotronex.read();
+   if(BluetoothData=='1'){   // if number 1 pressed ....
+   digitalWrite(ledpin,1);
+   Genotronex.println("LED  On D13 ON ! ");
+   }
+  if (BluetoothData=='0'){// if number 0 pressed ....
+  digitalWrite(ledpin,0);
+   Genotronex.println("LED  On D13 Off ! ");
+  }
+}
+delay(100);// prepare for next data ...
+}
+

@@ -1,0 +1,7 @@
+source files from:
+
+https://www.creatroninc.com/product/hc-05-bluetooth-shield/
+
+https://www.creatroninc.com/upload/HC-05%20Bluetooth%20Shield/AT%20Command%20Set.pdf
+https://www.creatroninc.com/upload/HC-05%20Bluetooth%20Shield/HC-05%20Bluetooth%20Shield%20Demo.zip
+
