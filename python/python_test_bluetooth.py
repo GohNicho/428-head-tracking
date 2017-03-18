@@ -75,8 +75,14 @@ if __name__ == '__main__':
             continue
         else:
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
-            print (data_list)
+            for i in range (0,3):
+                print (data_list[i])
             
+            print("ax_value, ay_value, az_value:")  # accel_x, accel_y, accel_z
+            for i in range (3,7):
+                print (data_list[i]) 
+                
+                               
             ser.write(b"L") #make built in light turn off
   
         

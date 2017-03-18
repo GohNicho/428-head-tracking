@@ -175,11 +175,26 @@ MPU6050 mpu;
 // components with gravity removed and adjusted for the world frame of
 // reference (yaw is relative to initial orientation, since no magnetometer
 // is present in this case). Could be quite handy in some cases.
-//#define OUTPUT_READABLE_WORLDACCEL
+#define OUTPUT_READABLE_WORLDACCEL
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
 //#define OUTPUT_TEAPOT
+
+/************************************************************************************************
+Complementary Filter Function
+
+AngleAccurate = (GyroPercentge)* AngleGyroscope + (1-GyroPercentage) * AngleAcceleration
+
+************************************************************************************************/
+float computeComplementaryFilter ( float AngleGyro, float AngleAccel, float GyroPercentage )
+
+{
+  
+  AngleAccurate = (GyroPercentage*AngleGyro) + ((1-GyroPercentage)* AngleAccel);
+  return (AngleAccurate);
+  
+}  
 
 /********************************************************************************************
  * 
@@ -515,6 +530,11 @@ void loop() {
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+
+            float acc_x_val = aaWorld.x
+            float acc_y_val = aaWorld.y
+            float acc_z_val = aaWorld.z
+                    
             Serial.print("aworld\t");
             Serial.print(aaWorld.x);
             Serial.print("\t");
@@ -560,7 +580,17 @@ void loop() {
             }
 
            if (recvChar == 'M'){
-             blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
+             //float GyroPercentage = 0.9;
+              
+
+             //float new_x_val = computeComplementaryFilter = (x_val, acc_x_val, GyroPercentage);
+             //float new_y_val = computeComplementaryFilter = (y_val, acc_y_val, GyroPercentage);
+             //float new_z_val = computeComplementaryFilter = (z_val, acc_z_val, GyroPercentage);
+
+            //blueToothSerial.println(String(new_x_val) + "," + String(new_y_val) + "," + String(new_z_val));  //Yaw, Pitch and Roll values
+             
+             blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values
+            
            }
     }
 
