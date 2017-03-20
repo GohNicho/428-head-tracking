@@ -175,7 +175,7 @@ MPU6050 mpu;
 // components with gravity removed and adjusted for the world frame of
 // reference (yaw is relative to initial orientation, since no magnetometer
 // is present in this case). Could be quite handy in some cases.
-#define OUTPUT_READABLE_WORLDACCEL
+//#define OUTPUT_READABLE_WORLDACCEL
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
@@ -594,9 +594,9 @@ void loop() {
              //float new_y_val = computeComplementaryFilter = (y_val, acc_y_val, GyroPercentage);
              //float new_z_val = computeComplementaryFilter = (z_val, acc_z_val, GyroPercentage);
 
-            //blueToothSerial.println(String(new_x_val) + "," + String(new_y_val) + "," + String(new_z_val));  //Yaw, Pitch and Roll values
+            blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
              
-             blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values
+             //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values and acc values
             
            }
     }

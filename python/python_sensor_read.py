@@ -57,6 +57,7 @@ if __name__ == '__main__':
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
     
+    heading_flag = False # heading flag == False when local direction isn't measured at start.
     
     cur_mouse_coordinates = pyautogui.position()
     new_x_coordinate = (cur_mouse_coordinates[0])
@@ -68,7 +69,9 @@ if __name__ == '__main__':
     move_amt_max = 20
     cnt = 0
     
-    move_amt = 10   
+    move_amt = 10 
+    
+    heading = [0,0,0]
     
     print ("conecting to serial port ...\n")
     ser = serial.Serial(serial_port, serial_speed, timeout=1)
@@ -99,8 +102,20 @@ if __name__ == '__main__':
             print ("Getting Ready, Data Error")
             continue
         else:
+            
+            
+            if (heading_flag == False ):
+                print ("getting starting heading")
+                for i in range (1,101):  #average 100 measurements to get starting heading
+                    for j in range(len(data_list)):
+                        heading[j] = heading[j] + data_list[j]
+                for j in range(len(heading)):
+                    heading[j] = heading[j] / 100
+                heading_flag = True    
+        
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
             print (data_list)
+            print (heading)
             
             cur_mouse_coordinates = pyautogui.position()
            
@@ -113,28 +128,28 @@ if __name__ == '__main__':
                 move_amt_max = 20
             
             #look left
-            if (data_list[0] < 80 ):  
+            if (data_list[0] < (heading[0] -20) ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
                 movement = True    
             
             #look right    
-            if (data_list[0] > 110 ):  
+            if (data_list[0] > (heading[0] + 20) ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
                 movement = True    
             
             #look up    
-            if (data_list[1] > -37 ):  
+            if (data_list[1] > (heading[1] + 15) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] - move_amt)
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
                 movement = True     
                 
             #look down    
-            if (data_list[1] < -50 ):  
+            if (data_list[1] < (heading[1] -15) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] + move_amt)
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
