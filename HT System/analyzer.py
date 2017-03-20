@@ -46,10 +46,8 @@ class Item:
         self.gesture = gesture      # gesture - left, right, up, down head gestures
         self.choice = choice        # choice name (ex. order pizza, order drinks)
         self.time = 0               # how long the gesture lasted
-        self.__start = 0            # start of the timer
-
         
-    def select_choice(self, gesture):
+    def select_choice(self, time, gesture):
         '''
         Given a gesture, returns the next choice
         '''
@@ -192,11 +190,12 @@ class HTSystem:
     def set_client(self, client):
         self.client = client
         
-    def read(self, vals):
+    def read(self, vals, gesture):
         '''
-        reads the quaternion values from the device
+        reads the filtered values from the arduino and the gesture
         input:
-        vals - an array of len 4 that contains 
+        vals - an array of len 4 that contains
+        gesture - type of gesture (left, right, top)
         '''
         
         # store the values
@@ -206,20 +205,6 @@ class HTSystem:
         
         # check if a gesture is occurring
         
-        gest = self.check_gesture()
-        if gest:
-            self.update_choice(gest)
-        
-    def check_gesture(self, vals):
-        '''
-        checks to see if a gesture is underway
-        '''
-        
-    def update_choice(self, gest):
-        '''
-        Gesture occurred, change which decision node we're on
-        '''
-        self.__curr = self.__curr.select_choice(gest)
         
     def get_choices_tree(self):
         tree = self.__tree

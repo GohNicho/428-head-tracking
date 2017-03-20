@@ -19,15 +19,14 @@ class Database:
         '''
         add the numerical values from the device to the db
         input:
-        val - quaternion values which consist of [gravity, x_rot, y_rot, z_rot]
+        val - quaternion values which consist of [x_rot, y_rot, z_rot]
         '''
         try:
             self.__head_tracking.insert_one(
                     {
-                    "grav": vals[0],
-                    "x_rot": vals[1],
-                    "y_rot": vals[2],
-                    "z_rot": vals[3]
+                    "x_rot": vals[0],
+                    "y_rot": vals[1],
+                    "z_rot": vals[2]
                     })
         except Exception, e:
             print str(e)
