@@ -28,7 +28,7 @@ class Database:
                     "y_rot": vals[1],
                     "z_rot": vals[2]
                     })
-        except Exception, e:
+        except Exception as e:
             print str(e)
             
     def add_client(self, client, choices):
@@ -59,7 +59,7 @@ class Database:
         
         try:
             self.__client_session.insert_one(doc)
-        except Exception, e:
+        except Exception as e:
             print str(e)        
         
     def list_clients(self):
@@ -69,7 +69,7 @@ class Database:
         try:
             for doc in self.__client_session.find({}):
                 print doc
-        except Exception, e:
+        except Exception as e:
             print str(e)    
         
     def list_tracking(self):
@@ -81,5 +81,5 @@ class Database:
             for doc in self.__head_tracking.find({}):
                 print doc
                 
-        except Exception, e:
+        except Exception as e:
             print str(e)
