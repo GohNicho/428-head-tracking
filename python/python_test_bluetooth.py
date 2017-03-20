@@ -79,7 +79,7 @@ if __name__ == '__main__':
                 print (data_list[i])
             
             print("ax_value, ay_value, az_value:")  # accel_x, accel_y, accel_z
-            for i in range (3,7):
+            for i in range (3,6):
                 print (data_list[i]) 
                 
                                
