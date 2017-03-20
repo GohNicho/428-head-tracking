@@ -57,6 +57,7 @@ if __name__ == '__main__':
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
     
+    heading_flag = False # heading flag == False when local direction isn't measured at start.
     
     cur_mouse_coordinates = pyautogui.position()
     new_x_coordinate = (cur_mouse_coordinates[0])
@@ -99,6 +100,15 @@ if __name__ == '__main__':
             print ("Getting Ready, Data Error")
             continue
         else:
+            if (!heading_flag):
+                for i in range (1,101):  #average 100 measurements to get starting heading
+                    for for j in range(len(data_list)):
+                        heading[j] = heading[j] + data[j]
+
+                    for for j in range(len(heading)):
+                        heading[j] = heading[j] / 100
+                        
+            
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
             print (data_list)
             
