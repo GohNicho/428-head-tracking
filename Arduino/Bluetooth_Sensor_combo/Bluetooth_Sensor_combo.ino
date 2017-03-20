@@ -175,7 +175,7 @@ MPU6050 mpu;
 // components with gravity removed and adjusted for the world frame of
 // reference (yaw is relative to initial orientation, since no magnetometer
 // is present in this case). Could be quite handy in some cases.
-#define OUTPUT_READABLE_WORLDACCEL
+//#define OUTPUT_READABLE_WORLDACCEL
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
@@ -352,6 +352,11 @@ Data is printed as: acelX acelY acelZ giroX giroY giroZ
 Check that your sensor readings are close to 0 0 16384 0 0 0
 If calibration was succesful write down your offsets so you can set them in your projects using something similar to mpu.setXAccelOffset(youroffset)
 
+
+Sensor readings with offsets:  -2  -9  16380 0 0 0
+Your offsets: 95  5489  774 50  229 22
+
+
 */
 /**************************************************************************************/
 
@@ -362,13 +367,13 @@ If calibration was succesful write down your offsets so you can set them in your
     //mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // supply your own gyro offsets here, scaled for min sensitivity
-      mpu.setXAccelOffset(-100);
-      mpu.setYAccelOffset(5623);
-      mpu.setZAccelOffset(740); // 1688 factory default for my test chip
+      mpu.setXAccelOffset(95);
+      mpu.setYAccelOffset(5489);
+      mpu.setZAccelOffset(774); // 1688 factory default for my test chip
       
-      mpu.setXGyroOffset(47);
-      mpu.setYGyroOffset(234);
-      mpu.setZGyroOffset(24);
+      mpu.setXGyroOffset(50);
+      mpu.setYGyroOffset(229);
+      mpu.setZGyroOffset(22);
       
 
 /**************************************************************************************/
@@ -589,9 +594,9 @@ void loop() {
              //float new_y_val = computeComplementaryFilter = (y_val, acc_y_val, GyroPercentage);
              //float new_z_val = computeComplementaryFilter = (z_val, acc_z_val, GyroPercentage);
 
-            //blueToothSerial.println(String(new_x_val) + "," + String(new_y_val) + "," + String(new_z_val));  //Yaw, Pitch and Roll values
+            //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
              
-             blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values
+             //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values and acc values
             
            }
     }
