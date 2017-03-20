@@ -1,6 +1,7 @@
 from itertools import takewhile
 from utils import *
 from db import *
+import time
 
 is_tab = '\t'.__eq__
 
@@ -45,6 +46,23 @@ class Item:
         self.gesture = gesture      # gesture - left, right, up, down head gestures
         self.choice = choice        # choice name (ex. order pizza, order drinks)
         self.time = 0               # how long the gesture lasted
+        self.__start = 0            # start of the timer
+
+        
+    def select_choice(self, gesture):
+        '''
+        Given a gesture, returns the next choice
+        '''
+        
+        # save the time of the transaction
+        self.time = time.time()-self.__start
+        
+        for child in self.__children:
+            if child.get_gesture() == gesture:
+                return child
+    
+    def start_timer(self):
+        self.__start = time.time()
         
     def add_child(self, child):
         self.__children.append(child)
@@ -58,6 +76,15 @@ class Item:
         
     def get_child(self, ind):
         return self.__children[ind]
+    
+    def get_gesture(self):
+        return self.gesture
+    
+    def get_choice(self):
+        return self.choice
+    
+    def get_time(self):
+        return self.time
         
     def draw(self):
         # draws the graph for the corresponding data
@@ -65,7 +92,7 @@ class Item:
     
     def speak(self):
         '''
-        generate the text that will be spoken out loud
+        generate the text that will be spoken out loud by an api
         '''
         
         length = len(self.__children)
@@ -74,10 +101,17 @@ class Item:
         # remake text rather than storing in case the choices are changed
         if length > 2:    
             for i in range (0, length):
-                text += self.__children[i].gesture + " to select choice " + \
-                    self.__children[i].choice + ("," if i < length else ".")
+                text += "rotate your head to the " + self.__children[i].gesture \
+                    + " to select choice " + self.__children[i].choice + \
+                    ("," if i < length else ".")
         else:
             text = self.__children[i].choice
+            
+        # CALL TEXT TO SPEECH API HERE
+        
+        
+        # Begin tracking
+        self.start_timer()
 
 class HTSystem:
     # Head tracking system which consists of an infrustructure of items
@@ -95,6 +129,7 @@ class HTSystem:
         self.load_sys()           # load system information from file
         self.__data = []          # numerical data (for error checking)
         self.__db = Database()    # load up the database for the system
+        self.__incomp_gest = False  # True if waiting for a gesture to be completed
         
     
     def load_sys(self):
@@ -164,11 +199,45 @@ class HTSystem:
         vals - an array of len 4 that contains 
         '''
         
-    def save(self):
-        ''' Saves the data to mongodb and saves the drawn graph '''
-        # go through all items and save them
+        # store the values
+        self.__db.add_tracking(vals)
         
-
+        # perform drawing code here
+        
+        # check if a gesture is occurring
+        
+        gest = self.check_gesture()
+        if gest:
+            self.update_choice(gest)
+        
+    def check_gesture(self, vals):
+        '''
+        checks to see if a gesture is underway
+        '''
+        
+    def update_choice(self, gest):
+        '''
+        Gesture occurred, change which decision node we're on
+        '''
+        self.__curr = self.__curr.select_choice(gest)
+        
+    def get_choices_tree(self):
+        tree = self.__tree
+        arr = []
+        
+        while tree.children:
+            for i in range (0, len(tree.children)):
+                if tree.children[i].time > 0:
+                    # picked this, store it's info
+                    arr.append((tree.get_choice(), tree.get_time()))
+                    tree = tree.children[i]
+        return arr
+        
+    def save(self):
+        ''' Saves client information the drawn graph '''
+        # go through all items and save them
+        arr = self.get_choices_tree()
+        self.__db.add_client(self, client, arr)
     
 
         

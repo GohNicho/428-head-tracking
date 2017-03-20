@@ -15,7 +15,7 @@ class Database:
         self.__head_tracking = self.__db['head_tracking']
         self.__client_session = self.__db['client_session']
         
-    def add_tracking(self, val):
+    def add_tracking(self, vals):
         '''
         add the numerical values from the device to the db
         input:
@@ -24,10 +24,10 @@ class Database:
         try:
             self.__head_tracking.insert_one(
                     {
-                    "grav": val[0],
-                    "x_rot": val[1],
-                    "y_rot": val[2],
-                    "z_rot": val[3]
+                    "grav": vals[0],
+                    "x_rot": vals[1],
+                    "y_rot": vals[2],
+                    "z_rot": vals[3]
                     })
         except Exception, e:
             print str(e)
