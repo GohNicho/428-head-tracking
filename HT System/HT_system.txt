@@ -1,0 +1,15 @@
+Hello. This is the head gesture system
+	left,Choice 1a
+		left,Choice 2a
+			left,Choice 3a
+			right,Choice 3b
+		right,Choice 2b
+			left,Choice 4a
+			right,Choice 4b
+	right,Choice 1b
+		left,Choice 5a
+			left,Choice 6a
+			right,Choice 6b
+		right,Choice 5b
+			left,Choice7a
+			right,Choice7b
