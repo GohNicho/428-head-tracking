@@ -594,7 +594,7 @@ void loop() {
              //float new_y_val = computeComplementaryFilter = (y_val, acc_y_val, GyroPercentage);
              //float new_z_val = computeComplementaryFilter = (z_val, acc_z_val, GyroPercentage);
 
-            //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
+            blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
              
              //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values and acc values
             
