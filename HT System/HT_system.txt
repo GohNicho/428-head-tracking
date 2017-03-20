@@ -1,4 +1,4 @@
-Hello. This is the head gesture system
+Hello. This is the head gesture system.
 	left,Choice 1a
 		left,Choice 2a
 			left,Choice 3a
