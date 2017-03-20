@@ -27,6 +27,10 @@ class Client:
 
     def get_fullname(self):
         return self.get_fname + " " + self.get_lname
+    
+    def get_info(self):
+        # returns all info in an array of tuples
+        return [("first_name",self.get_fname()), ("last_name",self.get_lname())]
         
 class Item:
     # Item for a given choice which keeps track of how it was accessed,
@@ -58,20 +62,22 @@ class Item:
     def draw(self):
         # draws the graph for the corresponding data
         return
-        
-    def save(self):
-        # saves the data
-        return
     
     def speak(self):
+        '''
+        generate the text that will be spoken out loud
+        '''
+        
         length = len(self.__children)
         text = ""
         
         # remake text rather than storing in case the choices are changed
-        if length > 2:
+        if length > 2:    
             for i in range (0, length):
                 text += self.__children[i].gesture + " to select choice " + \
-                    self.__children[i].choice
+                    self.__children[i].choice + ("," if i < length else ".")
+        else:
+            text = self.__children[i].choice
 
 class HTSystem:
     # Head tracking system which consists of an infrustructure of items
@@ -150,6 +156,13 @@ class HTSystem:
         
     def set_client(self, client):
         self.client = client
+        
+    def read(self, vals):
+        '''
+        reads the quaternion values from the device
+        input:
+        vals - an array of len 4 that contains 
+        '''
         
     def save(self):
         ''' Saves the data to mongodb and saves the drawn graph '''

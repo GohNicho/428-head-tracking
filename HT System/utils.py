@@ -16,3 +16,5 @@ def gen_data(t):
     while t < 150:
         print(gen_data(t))
         t += 1
+        
+########### Simulation code here ##############
