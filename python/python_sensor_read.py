@@ -6,6 +6,10 @@ from collections import deque
 
 import pyautogui
 
+import os
+
+
+
 '''
 #installing serial library python if not installed howto
 #http://stackoverflow.com/questions/33267070/no-module-named-serial
@@ -91,6 +95,8 @@ def running_average (value_queue, angles, maxQueueSize):
 
 if __name__ == '__main__':
     
+    os.system("say hello")
+    
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
     
@@ -151,6 +157,7 @@ if __name__ == '__main__':
         else:
             if (heading_flag == False ):  #get starting orientation of person/hat
                 print ("getting starting heading")
+                
                 heading = running_average(value_queue, data_list, 100)
                 #value_queue.clear()
                 heading_flag = True    
