@@ -146,6 +146,7 @@ class HTSystem:
         self.__progress = "none"        # Intermediate var-determine full head gesture
         self.__start = time.time()
         self.saved = False              # Check whether we saved the client info
+        self.client = Client("Test", "Test")
         
         if (self.__curr.speak()):
             # Begin tracking
@@ -264,7 +265,8 @@ class HTSystem:
         # go through all items and save them
         arr = self.get_choices_tree()
         print (arr)
-        self.__db.add_client(self, client, arr)
+        self.__db.add_client(self.client, arr)
+        self.saved = True
     
 
         
