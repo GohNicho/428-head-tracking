@@ -2,9 +2,13 @@ import serial
 import time
 
 from  analyzer import *  
-
+from collections import deque
 
 import pyautogui
+
+import os
+
+
 
 '''
 #installing serial library python if not installed howto
@@ -55,7 +59,43 @@ serial_speed = 38400
 serial_port = '/dev/tty.CrowBTSlave-DevB' # bluetooth shield?? need to test
 
 
+def running_average (value_queue, angles, maxQueueSize):
+    
+    '''
+    return the average of all of the values in the queue
+
+    the queue is assumed to be a list of lists, with in our case 3 elements per item                
+
+    each item is a triple of numbers made up of[x_angle, y_angle, z_angle]
+
+    '''    
+    result=angles
+    
+    value_queue.append(angles)
+    sizeOfQueue = len(value_queue) #current size of queue.
+    
+    if sizeOfQueue == 1:  #skip any calculations
+        return result    
+    
+    if sizeOfQueue > maxQueueSize:  #remove oldest item
+        value_queue.popleft()
+        sizeOfQueue = len(value_queue)
+    
+    for i in range(len(value_queue)):  #sum up the queue    
+        for j in range(len(value_queue[i])):
+            result[j] = result[j] + value_queue[i][j]
+    
+    for j in range(len(result)):  #get average
+        result[j] = result[j] / sizeOfQueue
+        
+    return result #return the average of the values on the queue       
+    
+    
+#----------------------------------------------------------------------------------    
+
 if __name__ == '__main__':
+    
+    os.system("say 8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
     
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
@@ -74,9 +114,15 @@ if __name__ == '__main__':
     
     move_amt = 10 
     
-    heading = [0,0,0]
+    heading = [0,0,0]  #the heading that the person is originally facing, need to update
     
-    gest = "None"
+    calibrate_size = 100 # the number of values averaged for calibration.
+    
+    gest = "None" #The current value of the gesture that was performed
+    
+    value_queue = deque([])  #the queue of the sizeOfQueue most recent readings  (sizeofQueue <= Max_size)
+    
+    maxQueueSize = 10  # max number of elements in the queue
     
     print ("conecting to serial port ...\n")
     ser = serial.Serial(serial_port, serial_speed, timeout=1)
@@ -84,7 +130,7 @@ if __name__ == '__main__':
     system = HTSystem()
     system.add_client("Stuart", "Simpson")
         
-    while (1):
+    while True:
         
         ser.write(b"H") #make built in Arduino light turn on
     
@@ -95,7 +141,6 @@ if __name__ == '__main__':
         ser.write(b"M") #send ready message for data
         data = ser.readline()
     
-        
         text = str(data)
         text = text[2:-5] # strip off leading and trailing cr/lf
     
@@ -110,25 +155,23 @@ if __name__ == '__main__':
             print ("Getting Ready, Data Error")
             continue
         else:
-            
-            
-            if (heading_flag == False ):
+            if (heading_flag == False ):  #get starting orientation of person/hat
                 print ("getting starting heading")
-                for i in range (1,101):  #average 100 measurements to get starting heading
-                    for j in range(len(data_list)):
-                        heading[j] = heading[j] + data_list[j]
-                for j in range(len(heading)):
-                    heading[j] = heading[j] / 100
+                
+                heading = running_average(value_queue, data_list, 100)
+                #value_queue.clear()
                 heading_flag = True    
-        
+                
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
+            
+            #data_list = running_average(value_queue, data_list, 100)
             print (data_list)
             print (heading)
             
             cur_mouse_coordinates = pyautogui.position()
            
             if (movement_prev == True):
-                move_amt = move_amt *1
+                move_amt = move_amt *1 #scale speed of mouse movement not using right now
                 if move_amt > 20:
                     move_amt_max=20
             else:
@@ -169,9 +212,9 @@ if __name__ == '__main__':
                 gest ="down"
                  
             pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
-            ser.write(b"L") #make built in Arduino ight turn off
+            ser.write(b"L") #make built in Arduino light turn off
             
-            if movement:
+            if movement == False:
                 gest = "None"
                 
             system.read(data_list, gest)
