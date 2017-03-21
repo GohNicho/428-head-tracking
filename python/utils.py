@@ -22,13 +22,13 @@ def gen_data(t):
 ########### Simulation code here ##############
         
 def test_analyzer():
-    system = HTSystem()
+    system = HTSystem("new_HT_system.txt")
     system.add_client("Vera", "Sipicki")
     
     i = 0
     t = time.time()
     
-    while i < 10000000:
+    while i < 10000000000000000000:
         if i % 2 == 0 and time.time()-t > 5.1:
             system.read([i+0.01, i+0.02, i+0.03], "left")
             print ("sent left")

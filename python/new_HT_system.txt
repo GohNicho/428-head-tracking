@@ -1,0 +1,4 @@
+Hello. This is the head gesture system.
+	left,Pizza
+	right,Drinks
+	up,Sides

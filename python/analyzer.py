@@ -71,7 +71,7 @@ class Item:
         for child in self.__children:
             if child.get_gesture() == gesture:
                 child.set_picked()
-                return child
+                return (child.get_choice(), self.time, child)
         
     def add_child(self, child):
         self.__children.append(child)
@@ -105,7 +105,8 @@ class Item:
         '''
         
         # speak the decision here
-        print (self.choice)
+        if not self.has_children():
+            print ("You've selected " + self.choice)
         
         # NTS: maybe add a wait time here
         
@@ -147,6 +148,7 @@ class HTSystem:
         self.__start = time.time()
         self.saved = False              # Check whether we saved the client info
         self.client = Client("Test", "Test")
+        self.times = []                 # Store the times since we changed to state machine
         
         if (self.__curr.speak()):
             # Begin tracking
@@ -222,29 +224,41 @@ class HTSystem:
         vals - an array of len 4 that contains
         gesture - type of gesture (left, right, top)
         '''
+
+        # store the values
+        self.__db.add_tracking(vals, gesture)
         
-        if self.__curr.has_children():
-            # store the values
-            self.__db.add_tracking(vals, gesture)
+        # perform drawing code here
+        
+        # check if a gesture is occurring
+        
+        if self.__progress.lower() in ["left", "right", "up", "down"] and \
+           gesture.lower() == "none":
+            # an action has been performed
+            print ("You've moved your head " + str(self.__progress.lower()))
             
-            # perform drawing code here
+            ch, ti, child = self.__curr.select_choice(self.__start, self.__progress)
+            self.times.append((ch,ti))
             
-            # check if a gesture is occurring
+            self.__curr = self.__tree
             
-            if self.__progress.lower() in ["left", "right", "up", "down"] and \
-               gesture.lower() == "none":
-                # an action has been performed
-                self.__curr = self.__curr.select_choice(self.__start, self.__progress)
+            # speak
+            child.speak()
+            print ("Press enter to continue, press q to stop the program")
+            ch = raw_input()           
+            
+            if ch.lower() == 'q':
+                # quitting
+                print ("Have a nice day!")
+                self.save()    
+                exit()
                 
-                # speak
-                if (self.__curr.speak()):
-                    # Begin tracking
-                    self.start_timer()
-            else:
-                # gesture is none so we'll save it
-                self.__progress = gesture.lower();
-        elif not self.saved:
-            self.save()
+            # Begin tracking
+            self.start_timer()             
+        else:
+            # gesture is none so we'll save it
+            self.__progress = gesture.lower();
+
         
         
     def get_choices_tree(self):
@@ -263,9 +277,7 @@ class HTSystem:
     def save(self):
         ''' Saves client information the drawn graph '''
         # go through all items and save them
-        arr = self.get_choices_tree()
-        print (arr)
-        self.__db.add_client(self.client, arr)
+        self.__db.add_client(self.client, self.times)
         self.saved = True
     
 

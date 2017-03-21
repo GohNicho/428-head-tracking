@@ -60,6 +60,7 @@ class Database:
         
         try:
             self.__client_session.insert_one(doc)
+            self.list_clients()
         except Exception as e:
             print (str(e))       
         
