@@ -131,7 +131,7 @@ if __name__ == '__main__':
     move_cursor_flag = False
     
     #to stop local printing set to false
-    local_printing = True
+    local_printing = False
     
     ###########################################
 

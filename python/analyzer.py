@@ -245,7 +245,7 @@ class HTSystem:
             # speak
             child.speak()
             print ("Press enter to continue, press q to stop the program")
-            ch = raw_input()           
+            ch = input()           
             
             if ch.lower() == 'q':
                 # quitting
