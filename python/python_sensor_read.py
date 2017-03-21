@@ -238,7 +238,7 @@ if __name__ == '__main__':
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
-            
+                
             elif gest != "None":
                 print("CURRENT GESTURE: " + gest)
                 gest = "None"
@@ -250,9 +250,11 @@ if __name__ == '__main__':
                 pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
 
    
-
-            if move_cursor_flag:
+            
+            if move_cursor_flag:     
                 pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
+
+
             ser.write(b"L") #make built in Arduino light turn off
             
             if movement == False:
