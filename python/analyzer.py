@@ -46,21 +46,32 @@ class Item:
         self.gesture = gesture      # gesture - left, right, up, down head gestures
         self.choice = choice        # choice name (ex. order pizza, order drinks)
         self.time = 0               # how long the gesture lasted
+        self.picked = False         # whether this choice was picked
         
-    def select_choice(self, time, gesture):
+    def set_picked(self):
+        self.picked = True
+        
+    def was_picked(self):
+        return self.picked
+        
+    def has_children(self):
+        return True if self.__children else False
+    
+    def num_children(self):
+        return len(self.__children)
+        
+    def select_choice(self, t, gesture):
         '''
         Given a gesture, returns the next choice
         '''
         
         # save the time of the transaction
-        self.time = time.time()-self.__start
+        self.time = time.time()-t
         
         for child in self.__children:
             if child.get_gesture() == gesture:
+                child.set_picked()
                 return child
-    
-    def start_timer(self):
-        self.__start = time.time()
         
     def add_child(self, child):
         self.__children.append(child)
@@ -93,23 +104,27 @@ class Item:
         generate the text that will be spoken out loud by an api
         '''
         
+        # speak the decision here
+        print (self.choice)
+        
+        # NTS: maybe add a wait time here
+        
         length = len(self.__children)
         text = ""
         
         # remake text rather than storing in case the choices are changed
-        if length > 2:    
+        if length >= 2:    
             for i in range (0, length):
-                text += "rotate your head to the " + self.__children[i].gesture \
+                text += "Rotate your head to the " + self.__children[i].gesture \
                     + " to select choice " + self.__children[i].choice + \
-                    ("," if i < length else ".")
-        else:
-            text = self.__children[i].choice
+                    (", " if i < length-1 else ".")
+        elif self.has_children():
+            text = self.__children[-1].choice
             
         # CALL TEXT TO SPEECH API HERE
+        print (text)
         
-        
-        # Begin tracking
-        self.start_timer()
+        return True
 
 class HTSystem:
     # Head tracking system which consists of an infrustructure of items
@@ -128,7 +143,16 @@ class HTSystem:
         self.__data = []          # numerical data (for error checking)
         self.__db = Database()    # load up the database for the system
         self.__incomp_gest = False  # True if waiting for a gesture to be completed
+        self.__progress = "none"        # Intermediate var-determine full head gesture
+        self.__start = time.time()
+        self.saved = False              # Check whether we saved the client info
         
+        if (self.__curr.speak()):
+            # Begin tracking
+            self.start_timer()
+    
+    def start_timer(self):
+        self.__start = time.time()    
     
     def load_sys(self):
         '''
@@ -170,7 +194,7 @@ class HTSystem:
                     item = item.get_parent()
                     
                 l = line.lstrip().split(',')
-                child = Item(l[0].lower(), l[1])
+                child = Item(l[0].lower(), "".join(l[1:]))
                 item.add_child(child)
                 
                 # store backups
@@ -198,30 +222,48 @@ class HTSystem:
         gesture - type of gesture (left, right, top)
         '''
         
-        # store the values
-        self.__db.add_tracking(vals)
-        
-        # perform drawing code here
-        
-        # check if a gesture is occurring
+        if self.__curr.has_children():
+            # store the values
+            self.__db.add_tracking(vals, gesture)
+            
+            # perform drawing code here
+            
+            # check if a gesture is occurring
+            
+            if self.__progress.lower() in ["left", "right", "up", "down"] and \
+               gesture.lower() == "none":
+                # an action has been performed
+                self.__curr = self.__curr.select_choice(self.__start, self.__progress)
+                
+                # speak
+                if (self.__curr.speak()):
+                    # Begin tracking
+                    self.start_timer()
+            else:
+                # gesture is none so we'll save it
+                self.__progress = gesture.lower();
+        elif not self.saved:
+            self.save()
         
         
     def get_choices_tree(self):
         tree = self.__tree
         arr = []
         
-        while tree.children:
-            for i in range (0, len(tree.children)):
-                if tree.children[i].time > 0:
+        while tree.has_children():
+            for i in range (0, tree.num_children()):
+                if tree.get_child(i).was_picked():
                     # picked this, store it's info
                     arr.append((tree.get_choice(), tree.get_time()))
-                    tree = tree.children[i]
+                    tree = tree.get_child(i)
+                    break
         return arr
         
     def save(self):
         ''' Saves client information the drawn graph '''
         # go through all items and save them
         arr = self.get_choices_tree()
+        print (arr)
         self.__db.add_client(self, client, arr)
     
 

@@ -61,7 +61,7 @@ class Database:
         try:
             self.__client_session.insert_one(doc)
         except Exception as e:
-            print (str(e))        
+            print (str(e))       
         
     def list_clients(self):
         '''
@@ -71,7 +71,7 @@ class Database:
             for doc in self.__client_session.find({}):
                 print (doc)
         except Exception as e:
-            print (str(e))    
+            print (str(e))
         
     def list_tracking(self):
         '''
