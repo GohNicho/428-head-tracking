@@ -15,7 +15,7 @@ class Database:
         self.__head_tracking = self.__db['head_tracking']
         self.__client_session = self.__db['client_session']
         
-    def add_tracking(self, vals):
+    def add_tracking(self, vals, gest):
         '''
         add the numerical values from the device to the db
         input:
@@ -26,10 +26,11 @@ class Database:
                     {
                     "x_rot": vals[0],
                     "y_rot": vals[1],
-                    "z_rot": vals[2]
+                    "z_rot": vals[2],
+                    "gesture": gest
                     })
         except Exception as e:
-            print str(e)
+            print (str(e))
             
     def add_client(self, client, choices):
         '''
@@ -60,7 +61,7 @@ class Database:
         try:
             self.__client_session.insert_one(doc)
         except Exception as e:
-            print str(e)        
+            print (str(e))        
         
     def list_clients(self):
         '''
@@ -68,9 +69,9 @@ class Database:
         '''
         try:
             for doc in self.__client_session.find({}):
-                print doc
+                print (doc)
         except Exception as e:
-            print str(e)    
+            print (str(e))    
         
     def list_tracking(self):
         '''
@@ -79,7 +80,7 @@ class Database:
         
         try:   
             for doc in self.__head_tracking.find({}):
-                print doc
+                print (doc)
                 
         except Exception as e:
-            print str(e)
+            print (str(e))
