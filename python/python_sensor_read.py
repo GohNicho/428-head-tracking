@@ -50,12 +50,12 @@ If we send 'H' to the Arduino it turns the on board light HIGH (on)
 #serial_port = '/dev/tty.usbmodem1421' # usb connection
 
 #serial_port = '/dev/tty.HC-06-DevB' # bluetooth shield hc-06
-py
+
 serial_speed = 38400
 serial_port = '/dev/tty.CrowBTSlave-DevB' # bluetooth shield?? need to test
 
 
-def running_average (value_queue, angles, maxQueueSize, result=None):
+def running_average (value_queue, angles, maxQueueSize):
     
     '''
     return the average of all of the values in the queue
@@ -65,27 +65,29 @@ def running_average (value_queue, angles, maxQueueSize, result=None):
     each item is a triple of numbers made up of[x_angle, y_angle, z_angle]
 
     '''    
-    if result is None:
-        result=[]
+    result=angles
     
     value_queue.append(angles)
     sizeOfQueue = len(value_queue) #current size of queue.
     
     if sizeOfQueue == 1:  #skip any calculations
-        return angles    
+        return result    
     
-    if sizeOfQueue > Max_Size:  #remove oldest item
+    if sizeOfQueue > maxQueueSize:  #remove oldest item
         value_queue.popleft()
-        sizeOfQueue = sizeOfQueue -1
+        sizeOfQueue = len(value_queue)
     
     for i in range(len(value_queue)):  #sum up the queue    
         for j in range(len(value_queue[i])):
-            result[j] = result[j] + value_queue
+            result[j] = result[j] + value_queue[i][j]
     
     for j in range(len(result)):  #get average
         result[j] = result[j] / sizeOfQueue
         
     return result #return the average of the values on the queue       
+    
+    
+#----------------------------------------------------------------------------------    
 
 if __name__ == '__main__':
     
@@ -149,17 +151,13 @@ if __name__ == '__main__':
         else:
             if (heading_flag == False ):  #get starting orientation of person/hat
                 print ("getting starting heading")
-                '''
-                for i in range (1, calibrate_size+1):  #average 100 measurements to get starting heading
-                    for j in range(len(data_list)):
-                        heading[j] = heading[j] + data_list[j]
-                for j in range(len(heading)):
-                    heading[j] = heading[j] / calibrate_size
-                '''
                 heading = running_average(value_queue, data_list, 100)
+                #value_queue.clear()
                 heading_flag = True    
                 
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
+            
+            #data_list = running_average(value_queue, data_list, 100)
             print (data_list)
             print (heading)
             
