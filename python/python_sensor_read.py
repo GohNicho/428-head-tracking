@@ -95,7 +95,7 @@ def running_average (value_queue, angles, maxQueueSize):
 
 if __name__ == '__main__':
     
-    os.system("say hello")
+    os.system("say 8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
     
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
