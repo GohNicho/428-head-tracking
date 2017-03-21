@@ -94,58 +94,38 @@ def running_average (value_queue, angles, maxQueueSize):
 #----------------------------------------------------------------------------------    
 
 if __name__ == '__main__':
-    
-    os.system("say 8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
-    
+    # os.system("say  8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
-    
     heading_flag = False # heading flag == False when local direction isn't measured at start.
-    
     cur_mouse_coordinates = pyautogui.position()
     new_x_coordinate = (cur_mouse_coordinates[0])
     new_y_coordinate = (cur_mouse_coordinates[1])
-
     movement = False
     movement_prev = False
-    
     move_amt_max = 20
     cnt = 0
-    
     move_amt = 10 
-    
     heading = [0,0,0]  #the heading that the person is originally facing, need to update
-    
     calibrate_size = 100 # the number of values averaged for calibration.
-    
     gest = "None" #The current value of the gesture that was performed
-    
     value_queue = deque([])  #the queue of the sizeOfQueue most recent readings  (sizeofQueue <= Max_size)
-    
     maxQueueSize = 10  # max number of elements in the queue
-    
     print ("conecting to serial port ...\n")
     ser = serial.Serial(serial_port, serial_speed, timeout=1)
-    
     system = HTSystem()
     system.add_client("Stuart", "Simpson")
         
+
     while True:
-        
         ser.write(b"H") #make built in Arduino light turn on
-    
         #time.sleep(4)
-        
         print ("recieving message from arduino ...\n") # data comes as a string
-        
         ser.write(b"M") #send ready message for data
         data = ser.readline()
-    
         text = str(data)
         text = text[2:-5] # strip off leading and trailing cr/lf
-    
         data_list = text.split(",")  #separate string into separate items by the comma.
-        
         #convert the string to a list of floats.  (drop errors, from the occasional bad data/ slow connections)
         
         try:
@@ -157,13 +137,11 @@ if __name__ == '__main__':
         else:
             if (heading_flag == False ):  #get starting orientation of person/hat
                 print ("getting starting heading")
-                
                 heading = running_average(value_queue, data_list, 100)
                 #value_queue.clear()
                 heading_flag = True    
                 
             print("x_value, y_value, z_value:")  # yaw, pitch and roll
-            
             #data_list = running_average(value_queue, data_list, 100)
             print (data_list)
             print (heading)
@@ -179,7 +157,7 @@ if __name__ == '__main__':
                 move_amt_max = 20
             
             #look left
-            if (data_list[0] < (heading[0] -20) ):  
+            if (data_list[0] < (heading[0] -20)):  
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
@@ -188,7 +166,7 @@ if __name__ == '__main__':
                   
             
             #look right    
-            if (data_list[0] > (heading[0] + 20) ):  
+            elif (data_list[0] > (heading[0] + 20) ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
@@ -196,7 +174,7 @@ if __name__ == '__main__':
                 gest = "right"    
             
             #look up    
-            if (data_list[1] > (heading[1] + 15) ):  
+            elif (data_list[1] > (heading[1] + 15) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] - move_amt)
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
@@ -204,18 +182,24 @@ if __name__ == '__main__':
                 gest = "up"
                 
             #look down    
-            if (data_list[1] < (heading[1] -15) ):  
+            elif (data_list[1] < (heading[1] -15) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] + move_amt)
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
-                 
+
+            elif gest != "None":
+                print("CURRENT GESTURE: " + gest)
+                gest = "None"
+                if str(raw_input("Press enter to continue: ")) or "continue" != "continue":
+                    break
+
             pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             ser.write(b"L") #make built in Arduino light turn off
             
-            if movement == False:
-                gest = "None"
+            # if movement == False:
+            #     gest = "None"
                 
             system.read(data_list, gest)
             
@@ -225,3 +209,4 @@ if __name__ == '__main__':
   
         
 print ("finish program and close connection!")
+			
