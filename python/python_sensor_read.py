@@ -1,6 +1,9 @@
 import serial
 import time
 
+from  analyzer import *  
+
+
 import pyautogui
 
 '''
@@ -73,8 +76,13 @@ if __name__ == '__main__':
     
     heading = [0,0,0]
     
+    gest = "None"
+    
     print ("conecting to serial port ...\n")
     ser = serial.Serial(serial_port, serial_speed, timeout=1)
+    
+    system = HTSystem()
+    system.add_client("Stuart", "Simpson")
         
     while (1):
         
@@ -132,14 +140,17 @@ if __name__ == '__main__':
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
-                movement = True    
+                movement = True
+                gest = "left"  
+                  
             
             #look right    
             if (data_list[0] > (heading[0] + 20) ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
-                movement = True    
+                movement = True
+                gest = "right"    
             
             #look up    
             if (data_list[1] > (heading[1] + 15) ):  
@@ -147,6 +158,7 @@ if __name__ == '__main__':
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
                 movement = True     
+                gest = "up"
                 
             #look down    
             if (data_list[1] < (heading[1] -15) ):  
@@ -154,9 +166,15 @@ if __name__ == '__main__':
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
                 movement = True
+                gest ="down"
                  
             pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             ser.write(b"L") #make built in Arduino ight turn off
+            
+            if movement:
+                gest = "None"
+                
+            system.read(data_list, gest)
             
             movement_prev = movement
             movement = False

@@ -178,7 +178,7 @@ class HTSystem:
                 pdepth = indent
                     
             stack[indent:] = [line.lstrip()]
-            print "Adding path:" + str(stack)
+            print ("Adding path:" + str(stack))
             
         # set the current active node as the tree
         self.__curr = self.__tree  
