@@ -1,7 +1,6 @@
 import serial
 import time
 
-from  analyzer import *  
 from collections import deque
 
 import pyautogui
@@ -93,7 +92,7 @@ def running_average (value_queue, angles, maxQueueSize):
 #----------------------------------------------------------------------------------    
 
 if __name__ == '__main__':
-    
+    '''
     first_name = input("What is your first_name? ")
     last_name = input ("What is your last_name? ")
     
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     system = HTSystem()
     system.add_client( first_name, last_name ) 
     ###########################################   
-    
+    '''
     
     #os.system("say 8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
     
@@ -130,7 +129,7 @@ if __name__ == '__main__':
     move_cursor_flag = False
     
     #to stop local printing set to false
-    local_printing = False
+    local_printing = True
     
     ###########################################
 
@@ -161,8 +160,7 @@ if __name__ == '__main__':
         
         if local_printing:
             print ("recieving message from arduino ...\n") # data comes as a string
-        
-        print ("recieving message from arduino ...\n") # data comes as a string
+    
         ser.write(b"M") #send ready message for data
         data = ser.readline()
         text = str(data)
@@ -192,10 +190,11 @@ if __name__ == '__main__':
                 print (heading)
                 heading_flag = True    
                 
-            print("x_value, y_value, z_value:")  # yaw, pitch and roll
-            #data_list = running_average(value_queue, data_list, 100)
-            print (data_list)
-            print (heading)
+                print("x_value, y_value, z_value:")  # yaw, pitch and roll
+                #data_list = running_average(value_queue, data_list, 100)
+                print (data_list)
+                
+                print (heading)
             
             cur_mouse_coordinates = pyautogui.position()
            
@@ -208,7 +207,7 @@ if __name__ == '__main__':
                 move_amt_max = 20
             
             #look left
-            if (data_list[0] < (heading[0] -20)):  
+            if (data_list[0] < (heading[0] -25)):  
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
@@ -217,7 +216,7 @@ if __name__ == '__main__':
                   
             
             #look right    
-            elif (data_list[0] > (heading[0] + 20) ):  
+            elif (data_list[0] > (heading[0] + 25) ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
@@ -225,7 +224,7 @@ if __name__ == '__main__':
                 gest = "right"    
             
             #look up    
-            elif (data_list[1] > (heading[1] + 15) ):  
+            elif (data_list[1] > (heading[1] + 20) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] - move_amt)
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
@@ -233,30 +232,33 @@ if __name__ == '__main__':
                 gest = "up"
                 
             #look down    
-            elif (data_list[1] < (heading[1] -15) ):  
+            elif (data_list[1] < (heading[1] -20) ):  
                 new_y_coordinate = (cur_mouse_coordinates[1] + move_amt)
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
             
+            elif gest != "None":
+                print("CURRENT GESTURE: " + gest)
+                gest = "None"
+                if str(input("Press enter to continue: ")) or "continue" != "continue":
+                    break
+            
             
             if move_cursor_flag:     
                 pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
 
-            elif gest != "None":
-                print("CURRENT GESTURE: " + gest)
-                gest = "None"
-                if str(raw_input("Press enter to continue: ")) or "continue" != "continue":
-                    break
+   
 
-            pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
+            if move_cursor_flag:
+                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             ser.write(b"L") #make built in Arduino light turn off
             
-            # if movement == False:
-            #     gest = "None"
+            if movement == False:
+                gest = "None"
                 
-            system.read(data_list, gest)
+            #system.read(data_list, gest)
             
             if local_printing:
                 print (gest)
