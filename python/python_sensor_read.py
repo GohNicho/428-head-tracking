@@ -239,16 +239,17 @@ if __name__ == '__main__':
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
-            
-            
-            if move_cursor_flag:     
-                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
-
             elif gest != "None":
                 print("CURRENT GESTURE: " + gest)
                 gest = "None"
                 if str(raw_input("Press enter to continue: ")) or "continue" != "continue":
                     break
+
+            
+            if move_cursor_flag:     
+                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
+
+
 
             pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             ser.write(b"L") #make built in Arduino light turn off
