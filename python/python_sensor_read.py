@@ -129,18 +129,23 @@ if __name__ == '__main__':
     move_cursor_flag = False
     
     #to stop local printing set to false
-    local_printing = True
+    local_printing = False
     
     ###########################################
 
     movement = False
     movement_prev = False
+    
+    gest = "None" #The current value of the gesture that was performed
+    gest_prev ="None"
+    
+    
     move_amt_max = 20
     cnt = 0
     move_amt = 10 
     heading = [0,0,0]  #the heading that the person is originally facing, need to update
     calibrate_size = 100 # the number of values averaged for calibration.
-    gest = "None" #The current value of the gesture that was performed
+    
     value_queue = deque([])  #the queue of the sizeOfQueue most recent readings  (sizeofQueue <= Max_size)
     maxQueueSize = 10  # max number of elements in the queue
     print ("conecting to serial port ...\n")
@@ -149,8 +154,8 @@ if __name__ == '__main__':
     
     
     
-    system = HTSystem()
-    system.add_client("Stuart", "Simpson")
+    # system = HTSystem()
+    # system.add_client("Stuart", "Simpson")
         
 
     while True:
@@ -207,16 +212,19 @@ if __name__ == '__main__':
                 move_amt_max = 20
             
             #look left
-            if (data_list[0] < (heading[0] -25)):  
+            
+            
+            
+            if (data_list[0] < (heading[0] -20) and movement == False ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
                 movement = True
                 gest = "left"  
-                  
+                
             
             #look right    
-            elif (data_list[0] > (heading[0] + 25) ):  
+            elif (data_list[0] > (heading[0] + 20) and movement == False):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
@@ -224,7 +232,7 @@ if __name__ == '__main__':
                 gest = "right"    
             
             #look up    
-            elif (data_list[1] > (heading[1] + 20) ):  
+            elif (data_list[1] > (heading[1] + 15) and movement == False):  
                 new_y_coordinate = (cur_mouse_coordinates[1] - move_amt)
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
@@ -232,33 +240,36 @@ if __name__ == '__main__':
                 gest = "up"
                 
             #look down    
-            elif (data_list[1] < (heading[1] -20) ):  
+            elif (data_list[1] < (heading[1] -15) and movement == False):  
                 new_y_coordinate = (cur_mouse_coordinates[1] + move_amt)
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
                 
-            elif gest != "None":
+            if (movement == True and movement_prev == False):
                 print("CURRENT GESTURE: " + gest)
+                #if str(input("Press enter to continue: ")) or "continue" != "continue":
+                #    break
+            
+            
+            if (movement == False and movement_prev == True and gest_prev != "None"):
+               
+                print("CURRENT GESTURE 1: " + gest)
+                
+                gest_prev = gest
                 gest = "None"
-                if str(input("Press enter to continue: ")) or "continue" != "continue":
-                    break
-            
+                
+                movement_prev = movement
+                movement = False    
+                
+            if move_cursor_flag:     
+                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             
             if move_cursor_flag:     
                 pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
-
-   
-            
-            if move_cursor_flag:     
-                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
-
 
             ser.write(b"L") #make built in Arduino light turn off
-            
-            if movement == False:
-                gest = "None"
                 
             #system.read(data_list, gest)
             
@@ -267,7 +278,7 @@ if __name__ == '__main__':
             
             movement_prev = movement
             movement = False
-            
+            ##gest = 'None'
   
         
 print ("finish program and close connection!")
