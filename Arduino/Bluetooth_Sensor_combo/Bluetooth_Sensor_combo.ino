@@ -181,23 +181,6 @@ MPU6050 mpu;
 // format used for the InvenSense teapot demo
 //#define OUTPUT_TEAPOT
 
-/************************************************************************************************
-Complementary Filter Function
-
-AngleAccurate = (GyroPercentge)* AngleGyroscope + (1-GyroPercentage) * AngleAcceleration
-
-************************************************************************************************/
-float computeComplementaryFilter ( float AngleGyro, float AngleAccel, float GyroPercentage )
-
-{
-  
-  float AngleAccurate =0;
-   
- AngleAccurate = (GyroPercentage*AngleGyro) + ((1-GyroPercentage)* AngleAccel);
-  return (AngleAccurate);
-  
-}  
-
 /********************************************************************************************
  * 
  * This function sets up the bluetooth connection
@@ -352,10 +335,13 @@ Data is printed as: acelX acelY acelZ giroX giroY giroZ
 Check that your sensor readings are close to 0 0 16384 0 0 0
 If calibration was succesful write down your offsets so you can set them in your projects using something similar to mpu.setXAccelOffset(youroffset)
 
+new sensor
+Sensor readings with offsets:  -3  -1  16382 0 0 0
+Your offsets: 2684  4297  1449  185 3191  74
 
-Sensor readings with offsets:  -2  -9  16380 0 0 0
-Your offsets: 95  5489  774 50  229 22
-
+Data is printed as: acelX acelY acelZ giroX giroY giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+If calibration was succesful write down your offsets so you can set them in your projects using something similar to mpu.setXAccelOffset(youroffset)
 
 */
 /**************************************************************************************/
@@ -367,13 +353,13 @@ Your offsets: 95  5489  774 50  229 22
     //mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // supply your own gyro offsets here, scaled for min sensitivity
-      mpu.setXAccelOffset(95);
-      mpu.setYAccelOffset(5489);
-      mpu.setZAccelOffset(774); // 1688 factory default for my test chip
+      mpu.setXAccelOffset(2684);
+      mpu.setYAccelOffset(4297);
+      mpu.setZAccelOffset(1449); // 1688 factory default for my test chip
       
-      mpu.setXGyroOffset(50);
-      mpu.setYGyroOffset(229);
-      mpu.setZGyroOffset(22);
+      mpu.setXGyroOffset(185);
+      mpu.setYGyroOffset(3191);
+      mpu.setZGyroOffset(74);
       
 
 /**************************************************************************************/
@@ -537,11 +523,6 @@ void loop() {
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-
-            float acc_x_val = aaWorld.x;
-            float acc_y_val = aaWorld.y;
-            float acc_z_val = aaWorld.z;
-                    
             Serial.print("aworld\t");
             Serial.print(aaWorld.x);
             Serial.print("\t");
@@ -587,17 +568,7 @@ void loop() {
             }
 
            if (recvChar == 'M'){
-             //float GyroPercentage = 0.9;
-              
-
-             //float new_x_val = computeComplementaryFilter = (x_val, acc_x_val, GyroPercentage);
-             //float new_y_val = computeComplementaryFilter = (y_val, acc_y_val, GyroPercentage);
-             //float new_z_val = computeComplementaryFilter = (z_val, acc_z_val, GyroPercentage);
-
-            blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
-             
-             //blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val) + "," + String (acc_x_val) + "," + String (acc_y_val) +"," + String (acc_z_val));  //Yaw, Pitch and Roll values and acc values
-            
+             blueToothSerial.println(String(x_val) + "," + String(y_val) + "," + String(z_val));  //Yaw, Pitch and Roll values
            }
     }
 
