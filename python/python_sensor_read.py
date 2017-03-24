@@ -6,6 +6,9 @@ from collections import deque
 
 import pyautogui
 
+import os
+
+
 '''
 #installing serial library python if not installed howto
 #http://stackoverflow.com/questions/33267070/no-module-named-serial
@@ -91,6 +94,28 @@ def running_average (value_queue, angles, maxQueueSize):
 
 if __name__ == '__main__':
     
+    first_name = input("What is your first_name? ")
+    last_name = input ("What is your last_name? ")
+    
+    print ("Hello", first_name, last_name, ".")
+    
+    ###########################################
+    
+    # change user name before running
+    system = HTSystem()
+    system.add_client( first_name, last_name ) 
+    ###########################################   
+    
+    
+    #os.system("say 8, 9, 2, 55, 127, 69, 80, 223, 6, 88, 512, 44, 3, 1")
+    
+    #os.system("say Hi, welcome to the pizzeria. Would you like to order a pizza, or sides?")
+    #os.system("say What size? Small, medium, or large?")
+    #os.system("say Okay, would you like to order sides as well?")
+    #os.system("say okay, your order is being processed.")
+    #os.system("say Which side? Wings, or potato wedges?")
+    #os.system("say Okay, would you like to order a pizza as well?")
+        
     screen_size = pyautogui.size()
     pyautogui.FAILSAFE = False
     
@@ -99,6 +124,16 @@ if __name__ == '__main__':
     cur_mouse_coordinates = pyautogui.position()
     new_x_coordinate = (cur_mouse_coordinates[0])
     new_y_coordinate = (cur_mouse_coordinates[1])
+    
+    ###########################################
+    
+    #set to false to stop cursor movment
+    move_cursor_flag = False
+    
+    #to stop local printing set to false
+    local_printing = False
+    
+    ###########################################
 
     movement = False
     movement_prev = False
@@ -121,16 +156,18 @@ if __name__ == '__main__':
     print ("conecting to serial port ...\n")
     ser = serial.Serial(serial_port, serial_speed, timeout=1)
     
-    system = HTSystem()
-    system.add_client("Stuart", "Simpson")
-        
+    
+    
+    
     while True:
         
         ser.write(b"H") #make built in Arduino light turn on
     
         #time.sleep(4)
         
-        print ("recieving message from arduino ...\n") # data comes as a string
+        
+        if local_printing:
+            print ("recieving message from arduino ...\n") # data comes as a string
         
         ser.write(b"M") #send ready message for data
         data = ser.readline()
@@ -150,16 +187,19 @@ if __name__ == '__main__':
             continue
         else:
             if (heading_flag == False ):  #get starting orientation of person/hat
+                
                 print ("getting starting heading")
+                
                 heading = running_average(value_queue, data_list, 100)
                 #value_queue.clear()
-                heading_flag = True    
-                
-            print("x_value, y_value, z_value:")  # yaw, pitch and roll
+                heading_flag = True 
+                print ("heading aligned.")   
             
-            #data_list = running_average(value_queue, data_list, 100)
-            print (data_list)
-            print (heading)
+            if local_printing:
+                print("x_value, y_value, z_value:")  # yaw, pitch and roll            
+                #data_list = running_average(value_queue, data_list, 100)
+                print (data_list)
+                print (heading)
             
             cur_mouse_coordinates = pyautogui.position()
            
@@ -203,14 +243,19 @@ if __name__ == '__main__':
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
-                 
-            pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
+            
+            
+            if move_cursor_flag:     
+                pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             ser.write(b"L") #make built in Arduino light turn off
             
             if movement == False:
                 gest = "None"
                 
             system.read(data_list, gest)
+            
+            if local_printing:
+                print (gest)
             
             movement_prev = movement
             movement = False
