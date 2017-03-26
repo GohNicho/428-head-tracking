@@ -6,6 +6,7 @@ from collections import deque
 import pyautogui
 
 import os
+import subprocess
 
 
 '''
@@ -98,7 +99,7 @@ if __name__ == '__main__':
     
     print ("Hello", first_name, last_name, ".")
     
-    ###########################################
+    # ###########################################
     
     # change user name before running
     system = HTSystem()
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     move_cursor_flag = False
     
     #to stop local printing set to false
-    local_printing = False
+    local_printing = True
     
     ###########################################
 
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     
     gest = "None" #The current value of the gesture that was performed
     gest_prev ="None"
-    
+    count = 0
     
     move_amt_max = 20
     cnt = 0
@@ -183,11 +184,18 @@ if __name__ == '__main__':
             if (heading_flag == False ):  #get starting orientation of person/hat
                 
                 print ("getting starting heading")
+                value_queue.clear()
                 heading = running_average(value_queue, data_list, 100)
-                #value_queue.clear()
+               
                 heading_flag = True 
                 print ("heading aligned.")   
             
+            for i in range (0,3):
+                if( data_list[i] < 0 ): 
+                    data_list[i]+= 360.0; #convert negative to positive angles
+                if( heading[i] < 0 ): 
+                    heading[i] += 360.0; #convert negative to positive angles
+               
             if local_printing:
                 print("x_value, y_value, z_value:")  # yaw, pitch and roll            
                 #data_list = running_average(value_queue, data_list, 100)
@@ -212,48 +220,52 @@ if __name__ == '__main__':
                 move_amt_max = 20
             
             #look left
-            
-            
-            
-            if (data_list[0] < (heading[0] -20) and movement == False ):  
+            if (data_list[0] < (heading[0] -25) and movement == False ):  
                 new_x_coordinate = (cur_mouse_coordinates[0] - move_amt)
                 if (new_x_coordinate < 0):
                     new_x_coordinate = 0
                 movement = True
-                gest = "left"  
-                
+                gest = "left"
             
             #look right    
-            elif (data_list[0] > (heading[0] + 20) and movement == False):  
+            if (data_list[0] > (heading[0] + 25) and movement == False):  
                 new_x_coordinate = (cur_mouse_coordinates[0] + move_amt)
                 if (new_x_coordinate > screen_size[0]):
                     new_x_coordinate = screen_size[0]
                 movement = True
-                gest = "right"    
+                gest = "right" 
+                   
             
             #look up    
-            elif (data_list[1] > (heading[1] + 15) and movement == False):  
+            if (data_list[1] > (heading[1] + 10) and movement == False):  
                 new_y_coordinate = (cur_mouse_coordinates[1] - move_amt)
                 if (new_y_coordinate < 0):
                     new_y_coordinate = 0
                 movement = True     
                 gest = "up"
                 
+                
             #look down    
-            elif (data_list[1] < (heading[1] -15) and movement == False):  
+            if (data_list[1] < (heading[1] -10) and movement == False):  
                 new_y_coordinate = (cur_mouse_coordinates[1] + move_amt)
                 if (new_y_coordinate > screen_size[1]):
                     new_y_coordinate = screen_size[1]
                 movement = True
                 gest ="down"
                 
+                
             if (movement == True and movement_prev == False):
                 print("CURRENT GESTURE: " + gest)
+                
+                #voice feedback for movement
+                message = ""
+                message = gest 
+                subprocess.call(["say",message])
                 #if str(input("Press enter to continue: ")) or "continue" != "continue":
                 #    break
             
             
-            if (movement == False and movement_prev == True and gest_prev != "None"):
+            if (movement == False and movement_prev == True):
                
                 print("CURRENT GESTURE 1: " + gest)
                 
@@ -262,7 +274,22 @@ if __name__ == '__main__':
                 
                 movement_prev = movement
                 movement = False    
+            
+                message = ""
+                message = "center"
+                subprocess.call(["say",message])
+            
+            
+            
+            
+            '''    
+            if (movement == False and movement_prev == False and gest_prev == "None"):  
+                count +=1
                 
+            if count == 20:
+                heading = running_average(value_queue, data_list, 100) #realign heading
+            
+            '''
             if move_cursor_flag:     
                 pyautogui.moveTo(new_x_coordinate, new_y_coordinate)
             
@@ -278,7 +305,9 @@ if __name__ == '__main__':
             
             movement_prev = movement
             movement = False
-            ##gest = 'None'
+            
+            
+            gest = 'None'
   
         
 print ("finish program and close connection!")
